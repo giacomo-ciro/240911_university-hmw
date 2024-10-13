@@ -13,7 +13,7 @@ if len(sys.argv) != 4:
     sys.exit(1)
 input_img = sys.argv[1]     # path to input file
 output_img = sys.argv[2]    # path to output file
-k = int(sys.argv[3])            # number of colors
+k = int(sys.argv[3])        # number of colors
 
 # -------------------------------------- #
 # ----- Load and prepare image --------- #
