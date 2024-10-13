@@ -20,11 +20,11 @@ k = int(sys.argv[3])        # number of colors
 # -------------------------------------- #
 
 img = Image.open(input_img)
-a = np.array(img)
-h, w, c = a.shape
+img = np.array(img)
+h, w, c = img.shape
 
 # Flatten
-X = a.reshape(h*w, c)
+X = img.reshape(h*w, c)
 
 # Get unique colors to upper bound k
 n_colors = np.unique(X, axis=0).shape[0]
@@ -37,14 +37,15 @@ if k > n_colors:
 # Center and scale the data
 print(f'Standardizing data...')
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+#X_scaled = scaler.fit_transform(X)
+X_scaled = X
 
 # -------------------------------------- #
 # ----- Apply K-Means clustering ------- #
 # -------------------------------------- #
 
 print(f'Clustering data...')
-kmeans = KMeans(n_clusters=k, random_state=42)  # Adjust 'n_clusters' as needed
+kmeans = KMeans(n_clusters=k, init='random', n_init=100)   # Adjust 'n_clusters' as needed
 kmeans.fit(X_scaled)
 
 # -------------------------------------- #
@@ -53,12 +54,13 @@ kmeans.fit(X_scaled)
 
 # Replace each pixel by its centroid
 X_compressed = kmeans.cluster_centers_[kmeans.labels_]
+obj = np.sum(np.sum((X_scaled.reshape(-1, 3) - X_compressed.reshape(-1, 3))**2, axis=1)**0.5)
+print(f'Objective value: {obj:,.2f}')
 
 # Convert back to RGB
-print(f'Converting back to RGB and saving...')
-img_compressed = scaler.inverse_transform(X_compressed).reshape(h, w, c).astype(np.uint8)
-# import matplotlib.pyplot as plt
-# plt.imshow(img_compressed)
-# plt.show()
+#img_compressed = scaler.inverse_transform(X_compressed).reshape(h, w, c).astype(np.uint8)
+img_compressed = X_compressed.reshape(h, w, c).astype(np.uint8)
+
+print(f'Saving compressed image to {output_img}')
 img_compressed = Image.fromarray(img_compressed, mode='RGB')
 img_compressed.save(output_img)

@@ -1,0 +1,2 @@
+set I := 1 2 3;  # indices
+param a := 1 10 2 20 3 30;  # parameter values
