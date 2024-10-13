@@ -1,0 +1,9 @@
+# Declaring five variables: p, q, r, s, t
+var p q x y;
+
+# Assigning complex expressions
+u = t and (not q) and x and y;
+z = u and u;
+
+# Show the truth table for u, v, w, x, y
+show_ones u z;
