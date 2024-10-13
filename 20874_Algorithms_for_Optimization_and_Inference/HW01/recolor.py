@@ -57,8 +57,8 @@ X_compressed = kmeans.cluster_centers_[kmeans.labels_]
 # Convert back to RGB
 print(f'Converting back to RGB and saving...')
 img_compressed = scaler.inverse_transform(X_compressed).reshape(h, w, c).astype(np.uint8)
-import matplotlib.pyplot as plt
-plt.imshow(img_compressed)
+# import matplotlib.pyplot as plt
+# plt.imshow(img_compressed)
 # plt.show()
 img_compressed = Image.fromarray(img_compressed, mode='RGB')
 img_compressed.save(output_img)
