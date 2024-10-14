@@ -2,18 +2,23 @@ import sys
 import numpy as np
 from PIL import Image
 
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from kmeans import KMeans
+# from sklearn.preprocessing import StandardScaler
+
+
 
 # -------------------------------------- #
 # ----- Get params from cmd ------------ #
 # -------------------------------------- #
+
 if len(sys.argv) != 4:
     print('Provide required arguments:\n\tpython recolor.py <input_img> <output_img> <k>')
     sys.exit(1)
+
 input_img = sys.argv[1]     # path to input file
 output_img = sys.argv[2]    # path to output file
 k = int(sys.argv[3])        # number of colors
+
 
 # -------------------------------------- #
 # ----- Load and prepare image --------- #
@@ -23,10 +28,8 @@ img = Image.open(input_img)
 img = np.array(img)
 h, w, c = img.shape
 
-# Flatten
 X = img.reshape(h*w, c)
 
-# Get unique colors to upper bound k
 n_colors = np.unique(X, axis=0).shape[0]
 
 print(f'Unique colors found in img: {n_colors}')
@@ -35,30 +38,29 @@ if k > n_colors:
     k = n_colors
 
 # Center and scale the data
-print(f'Standardizing data...')
-scaler = StandardScaler()
-#X_scaled = scaler.fit_transform(X)
-X_scaled = X
+# print(f'Standardizing data...')
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(X)
+# X_scaled = X
 
 # -------------------------------------- #
 # ----- Apply K-Means clustering ------- #
 # -------------------------------------- #
 
 print(f'Clustering data...')
-kmeans = KMeans(n_clusters=k, init='random', n_init=100)   # Adjust 'n_clusters' as needed
-kmeans.fit(X_scaled)
+kmeans = KMeans(n_clusters=k, init='random', n_init=10)   # Adjust 'n_clusters' as needed
+kmeans.fit(X)
 
 # -------------------------------------- #
 # ----- Convert back to RGB and save --- #
 # -------------------------------------- #
 
-# Replace each pixel by its centroid
-X_compressed = kmeans.cluster_centers_[kmeans.labels_]
-obj = np.sum(np.sum((X_scaled.reshape(-1, 3) - X_compressed.reshape(-1, 3))**2, axis=1)**0.5)
-print(f'Objective value: {obj:,.2f}')
+X_compressed = kmeans.centroids[kmeans.labels]
+print(f'Objective value: {kmeans.obj:,.2f}')
 
 # Convert back to RGB
 #img_compressed = scaler.inverse_transform(X_compressed).reshape(h, w, c).astype(np.uint8)
+# X_compressed = scaler.inverse_transform(X_compressed)
 img_compressed = X_compressed.reshape(h, w, c).astype(np.uint8)
 
 print(f'Saving compressed image to {output_img}')
