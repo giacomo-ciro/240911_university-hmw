@@ -1,43 +1,33 @@
 from PIL import Image
 import re
 import numpy as np
+import matplotlib.pyplot as plt
+
+unique_colors = np.load('./assets/unique_colors.npy')
+centroids = np.load('./assets/centroids.npy')
 
 with open('out.txt', 'r') as f:
     f = f.read()
-    print(f)
-    results = re.findall(r'Display statement at line 22.+Model has been successfully processed', f, re.DOTALL)[-1]
-    results = re.findall(r'(\d+,\d+)', results)
+    results = re.findall(r'(\d+,\d+)', f, re.DOTALL)
+    if not len(results) == unique_colors.shape[0]:
+        raise ValueError('Number of colors in the results is different from unique colors')
 
-color_lookup = {}
-for tup in results:
-    point, centroid = tup.split(',')
-    color_lookup[int(point)] = int(centroid)
+compression_lookup = {int(i[0]):int(i[1]) for i in [i.split(',') for i in results]} # original color : assigned centroid
 
-X = np.array(Image.open("./20col.png"))
+img = Image.open('20col.png')
+X = np.array(img)
 h, w, c = X.shape
-
-X = X.reshape(-1, 3)
-
-unique_colors = np.unique(X, axis=0) / 255
-
-centroids = []
-with open('centroids.txt', 'r') as f:
-    for line in f:
-        line = line.strip().split(',')
-        centroids.append([float(x) for x in line])
-centroids = np.array(centroids)
-print(centroids)
+X = X.reshape(-1, c)
 
 for i in range(unique_colors.shape[0]):
-    print(f'Color {i+1}: {unique_colors[i]}')
-    print(f'Assigned to centroid {color_lookup[i+1]}: {centroids[i]}')
-    print()
+    idx = np.where(X == unique_colors[i])[0]
+    X[idx] = centroids[compression_lookup[i+1]]
 
-# Replace colors in image according to color lookup
-for i in range(unique_colors.shape[0]):
-    print(X[np.all(X == unique_colors[i].reshape(1, -1), axis=1)])
-
-X = X.reshape(h, w, c)
-import matplotlib.pyplot as plt
-plt.imshow(X)
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.title('Orginal Image')
+plt.imshow(img)
+plt.subplot(1, 2, 2)
+plt.title('IP-compressed Image')
+plt.imshow(X.reshape(h, w, c))
 plt.show()

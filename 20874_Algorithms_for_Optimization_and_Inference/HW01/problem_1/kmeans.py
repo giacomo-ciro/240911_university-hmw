@@ -25,8 +25,8 @@ class KMeans:
         """
         
         if self.normalize:
-            self.std = X.std(axis=0)
-            self.mean = X.mean(axis=0)
+            # self.std = X.std(axis=0)
+            # self.mean = X.mean(axis=0)
             # X = (X - self.mean) / self.std
             X = X / 255
         
