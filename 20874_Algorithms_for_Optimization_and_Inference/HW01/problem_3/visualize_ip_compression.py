@@ -30,4 +30,7 @@ plt.imshow(img)
 plt.subplot(1, 2, 2)
 plt.title('IP-compressed Image')
 plt.imshow(X.reshape(h, w, c))
+
+plt.savefig('./assets/ip_compressed_image.png')
+
 plt.show()
