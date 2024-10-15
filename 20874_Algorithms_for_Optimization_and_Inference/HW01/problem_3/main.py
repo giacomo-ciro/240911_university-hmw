@@ -1,29 +1,35 @@
 import numpy as np
 from PIL import Image
+import itertools
 
-MAX_OBJ = 4814760.748061607  # best objective value found for 100 init with k = 8
+TARGET_OBJ = 20871.86  # best objective value found for 100 init with k = 8
 
-def obj(X, y):
-    """
-    Computes the sum of the L2 distance between a set of vectors X of shape
-    (n_vectors, n_features) and a target vector y of shape (n_features,)  
+img = Image.open("../problem_1/20col.png")
+a = np.array(img)
+h, w, c = a.shape
+
+def get_tentative_clusters(X, TARGET_OBJ):
+
+    unique_colors, colors_count = np.unique(x.reshape(-1, 3), axis=0, return_counts=True)
+    unique_colors = unique_colors / 255
+
+    centroids = []
+
+    subset_msk = itertools.product([0, 1], repeat=len(unique_colors))
+
+    for i, msk in enumerate(subset_msk):
+        
+        if i % 1e5 == 0:
+            print(f'Iteration: {i} / {2**len(unique_colors):09,}')
+        
+        if sum(msk) == 0:
+            continue
+        
+        subset = unique_colors[np.array(msk) == 1]
+        subset_counts = colors_count[np.array(msk) == 1]
+        subset_obj = np.sum(np.linalg.norm(subset - subset.mean(axis=0), axis=1) * subset_counts)
+        
+        if TARGET_OBJ > subset_obj:
+            centroids.append(subset.mean(axis=0))
     
-    """
-    return np.sum(np.sum((X - y)**2, axis=1)**0.5)
-
-
-
-def get_tentative_clusters(X, MAX_OBJ, obj):
-    clusters = []
-    n = len(X)
-    s_list = list(X)  # for indexing
-
-    for i in range(2 ** n):
-        cluster = []
-        for j in range(n):
-            # Check if the j-th element should be included
-            if (i & (1 << j)):
-                cluster.append(s_list[j])
-        if obj(np.array(cluster), np.mean(cluster, axis=0)) < MAX_OBJ:
-            clusters.append(cluster) 
-
+    return centroids

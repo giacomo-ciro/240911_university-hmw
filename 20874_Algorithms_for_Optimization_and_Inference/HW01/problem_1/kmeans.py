@@ -27,8 +27,9 @@ class KMeans:
         if self.normalize:
             self.std = X.std(axis=0)
             self.mean = X.mean(axis=0)
-            X = (X - self.mean) / self.std
-
+            # X = (X - self.mean) / self.std
+            X = X / 255
+        
         best_obj = np.inf
 
         for _ in range(self.n_init):
@@ -43,8 +44,10 @@ class KMeans:
                 print('New best objective:', best_obj)
         
         if self.normalize:
-            best_centroids = best_centroids * self.std + self.mean
-            X = X * self.std + self.mean
+            # best_centroids = best_centroids * self.std + self.mean
+            # X = X * self.std + self.mean
+            best_centroids = best_centroids * 255
+            X = X * 255
 
         self.centroids = best_centroids
         self.obj = best_obj
