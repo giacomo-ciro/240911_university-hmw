@@ -1,7 +1,7 @@
 import numpy as np
 
 class KMeans:
-    def __init__(self, n_clusters=None, init='random', n_init=10, tol = 1e-4):
+    def __init__(self, n_clusters=None, init='random', n_init=10, tol = 1e-4, normalize=False):
 
         if n_clusters is None:
             raise ValueError('Number of clusters must be specified.')
@@ -10,6 +10,7 @@ class KMeans:
         self.n_init = 1 if init == 'frequency' else n_init
         self.init = init
         self.tol = tol
+        self.normalize = normalize
 
     def fit(self, X, max_iters=300):
         """
@@ -22,16 +23,29 @@ class KMeans:
                 Maximum number of iterations for one run of Lloyd's algorithm.
 
         """
+        
+        if self.normalize:
+            self.std = X.std(axis=0)
+            self.mean = X.mean(axis=0)
+            X = (X - self.mean) / self.std
+
         best_obj = np.inf
+
         for _ in range(self.n_init):
             
             centroids, new_obj = self.lloyd(X, max_iters=max_iters)
+            
             print(f'Iteration: {_+1:03} | Objective: {new_obj:,.2f}')
+            
             if new_obj < best_obj:
                 best_obj = new_obj
                 best_centroids = centroids
                 print('New best objective:', best_obj)
         
+        if self.normalize:
+            best_centroids = best_centroids * self.std + self.mean
+            X = X * self.std + self.mean
+
         self.centroids = best_centroids
         self.obj = best_obj
         self.labels = self.predict(X)
@@ -56,7 +70,7 @@ class KMeans:
             sorted_indices = np.argsort(counts)[::-1]
             centroids = points[sorted_indices[:self.n_clusters]]
         
-        elif self.init == 'frequency + noise':
+        elif self.init == 'frequency+':
             points, counts = np.unique(X, axis=0, return_counts=True)
             sorted_indices = np.argsort(counts)[::-1]
             centroids = points[sorted_indices[:self.n_clusters]]
@@ -65,7 +79,8 @@ class KMeans:
         iter = 0
         while iter < max_iters:
 
-            labels = np.argmin(np.linalg.norm(X[:, None] - centroids, axis=2), axis=1)
+            distances = np.linalg.norm(X[:, None] - centroids, axis=2)
+            labels = np.argmin(distances, axis=1)
             
             new_centroids = np.array([X[labels == i].mean(axis=0) if np.any(labels == i) else centroids[i] for i in range(self.n_clusters)])
             
@@ -73,10 +88,11 @@ class KMeans:
                 centroids = new_centroids
                 print(f'Converged in {iter} iterations.')
                 break
+            
             centroids = new_centroids
             iter += 1
 
-        return centroids, np.min(np.linalg.norm(X[:, None] - centroids, axis=2), axis=1).sum()
+        return centroids, np.min(distances, axis=1).sum()
         
     
     def predict(self, X):

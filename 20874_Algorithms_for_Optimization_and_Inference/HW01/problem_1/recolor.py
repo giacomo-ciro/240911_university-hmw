@@ -48,7 +48,11 @@ if k > n_colors:
 # -------------------------------------- #
 
 print(f'Clustering data...')
-kmeans = KMeans(n_clusters=k, init='random', n_init=10)   # Adjust 'n_clusters' as needed
+kmeans = KMeans(n_clusters=k,
+                init='random',
+                n_init=10,
+                normalize=True
+                )   # Adjust 'n_clusters' as needed
 kmeans.fit(X)
 
 # -------------------------------------- #
