@@ -10,7 +10,7 @@ h, w, c = a.shape
 
 def get_tentative_clusters(X, TARGET_OBJ):
 
-    unique_colors, colors_count = np.unique(x.reshape(-1, 3), axis=0, return_counts=True)
+    unique_colors, colors_count = np.unique(X.reshape(-1, 3), axis=0, return_counts=True)
     unique_colors = unique_colors / 255
 
     centroids = []
