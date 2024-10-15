@@ -1,0 +1,66 @@
+GLPSOL--GLPK LP/MIP Solver 5.0
+Parameter(s) specified in the command line:
+ --model main.mod --data main.dat
+Reading model section from main.mod...
+main.mod:24: warning: final NL missing before end of file
+24 lines were read
+Reading data section from main.dat...
+main.dat:51: warning: final NL missing before end of file
+main.dat:51: warning: unexpected end of file; missing end statement inserted
+51 lines were read
+Generating obj...
+Generating c1...
+Generating c2...
+Generating c3...
+Model has been successfully generated
+GLPK Integer Optimizer 5.0
+122 rows, 2100 columns, 6192 non-zeros
+2100 integer variables, all of which are binary
+Preprocessing...
+121 rows, 2100 columns, 4200 non-zeros
+2100 integer variables, all of which are binary
+Scaling...
+ A: min|aij| =  1.000e+00  max|aij| =  2.000e+01  ratio =  2.000e+01
+GM: min|aij| =  9.543e-01  max|aij| =  1.048e+00  ratio =  1.098e+00
+EQ: min|aij| =  9.106e-01  max|aij| =  1.000e+00  ratio =  1.098e+00
+2N: min|aij| =  1.000e+00  max|aij| =  1.250e+00  ratio =  1.250e+00
+Constructing initial basis...
+Size of triangular part is 121
+Solving LP relaxation...
+GLPK Simplex Optimizer 5.0
+121 rows, 2100 columns, 4200 non-zeros
+      0: obj =   1.288219000e+05 inf =   2.800e+01 (1)
+      7: obj =   1.288219000e+05 inf =   0.000e+00 (0)
+*   138: obj =   4.113444000e+04 inf =   0.000e+00 (0)
+OPTIMAL LP SOLUTION FOUND
+Integer optimization begins...
+Long-step dual simplex will be used
++   138: mip =     not found yet >=              -inf        (1; 0)
++   231: >>>>>   4.196891000e+04 >=   4.113444000e+04   2.0% (82; 0)
++  3985: mip =   4.196891000e+04 >=     tree is empty   0.0% (0; 6787)
+INTEGER OPTIMAL SOLUTION FOUND
+Time used:   2.9 secs
+Memory used: 4.0 Mb (4146343 bytes)
+Display statement at line 22
+obj.val = 41968.91
+   (1,5)
+   (2,3)
+   (3,9)
+   (4,17)
+   (5,9)
+   (6,2)
+   (7,65)
+   (8,17)
+   (9,65)
+   (10,5)
+   (11,33)
+   (12,9)
+   (13,65)
+   (14,33)
+   (15,17)
+   (16,9)
+   (17,5)
+   (18,3)
+   (19,2)
+   (20,1)
+Model has been successfully processed
