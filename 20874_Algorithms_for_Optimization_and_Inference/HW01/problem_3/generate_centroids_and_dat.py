@@ -6,14 +6,16 @@ import sys
 if len(sys.argv) > 1:
     TARGET_OBJ = float(sys.argv[1])
 else:
-    TARGET_OBJ = 5255523.91  # best objective value found for 100 init with k = 8 unormalized
+    TARGET_OBJ = 4347298.25  # best objective value found for 1000 init with k = 8 unormalized with frequency+ and noise N(0, 15)
 
 print('Reading image...')
 img = Image.open("./20col.png")
 X = np.array(img)
 h, w, c = X.shape
 unique_colors, colors_count = np.unique(X.reshape(-1, 3), axis=0, return_counts=True)
-unique_colors = unique_colors
+
+N = unique_colors.shape[0]
+k = 8
 
 # -------------------------------------- #
 # ----- Generate centroids -------------- #
@@ -26,19 +28,25 @@ for i, msk in enumerate(subset_msk):
     if i % 1e5 == 0:
         print(f'Iteration: {i:,} / {2**len(unique_colors):09,}')
     
-    if sum(msk) == 0:
+    subset_cardinality = sum(msk)
+    if subset_cardinality == 0 or subset_cardinality >= (N-k+2):
         continue
     
     subset = unique_colors[np.array(msk) == 1]
     subset_counts = colors_count[np.array(msk) == 1]
     subset_obj = np.sum(np.linalg.norm(subset - subset.mean(axis=0), axis=1) * subset_counts)
+
+    # If already above target, skip
+    if TARGET_OBJ < subset_obj:
+        continue
+
+    centroids.append(subset.mean(axis=0))
     
-    if TARGET_OBJ > subset_obj:
-        centroids.append(subset.mean(axis=0))
 print(f'Centroids found: {len(centroids):,}')
 
 centroids = np.array(centroids)
-# centroids = centroids[:100]
+idx = np.random.choice(np.arange(centroids.shape[0]), 2000, replace=False)
+centroids = centroids[idx]
 
 # Save to reconstruct image later
 np.save('./assets/centroids.npy', centroids)

@@ -77,7 +77,9 @@ class KMeans:
             points, counts = np.unique(X, axis=0, return_counts=True)
             sorted_indices = np.argsort(counts)[::-1]
             centroids = points[sorted_indices[:self.n_clusters]]
-            centroids += np.random.normal(0, 1, centroids.shape).astype(np.uint8)
+            centroids = centroids.astype(np.float64)
+            centroids += np.random.normal(0, 15, centroids.shape)
+            centroids = centroids.clip(0, 255).astype(np.uint8)
         
         iter = 0
         while iter < max_iters:
